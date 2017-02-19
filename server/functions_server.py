@@ -19,6 +19,7 @@ import pickle
 from parameters_server import *
 pygame.init()
 
+
 def count_unique(keys):
     uniq_keys = numpy.unique(keys)
     bins = uniq_keys.searchsorted(keys)
@@ -176,7 +177,6 @@ def MOT(objects, trial=999, Subnum=999, SUBDIR=999):
     return objects
 
 
-
 def markall(objects,feedback=0):
     pygame.mouse.set_visible(1)
 
@@ -191,18 +191,18 @@ def markall(objects,feedback=0):
     start = time.time()
     elapsed = time.time() - start
     mark_onset = elapsed
-    
-    
-    selobjidx = []
+
     selcor_objidx = []
     selwrong_objidx = []
     
     notselected = 1
-    selectedobj = 0
     selectorder = numpy.zeros(OBJNUM)
     rank = 1
     checkcounter = numpy.zeros(OBJNUM)        
      
+    global selectedobj
+    global selobjidx
+
     while notselected:
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -220,9 +220,7 @@ def markall(objects,feedback=0):
                                 object.thickness = 0
                                 checkcounter[i] += 1
                                 #selectedobj = selectedobj + 1
-    
-    
-    
+                                
                                 if (checkcounter[i]-1) % 4 == 0:
                                     object.colour = SKYBLUE
                                     selectedobj = selectedobj + 1
@@ -238,7 +236,38 @@ def markall(objects,feedback=0):
                                     object.colour = WHITE
                                     selectedobj = selectedobj - 1
                                     selobjidx.remove(i)
-         
+#                                elif object.colour == COLOROTHER:
+#                                    object.colour == BLUE
+#                                    selectedobj = selectedobj + 1
+#                                    selobjidx.append(i)
+#                                    print('appended %s' %i)
+#                                    
+
+
+                    #            if checkcounter[i] % 2 == 0
+                     #               object.colour = BLUE
+                      #              selectedobj = selectedobj + 1
+                       #             selobjidx.append(i)
+                        #        elif checkcounter[i] % 2 == 1
+                         #           object.colour = WHITE
+                          #          selectedobj = selectedobj - 1
+                           #         selobjidx.remove(i)
+
+    
+                           #     if (checkcounter[i]-1) % 2 == 0:
+                            #        object.colour = BLUE
+                             #       selectedobj = selectedobj + 1
+                              #      selobjidx.append(i)
+                               #     print('appended %s' %i)
+    ##                                                elif (checkcounter[i]-2) % 4 == 0:
+    ##                                                    object.colour = BLUE
+    ##                                                elif (checkcounter[i]-3) % 4 == 0:
+    ##                                                    object.colour = DARKBLUE
+                                #elif (checkcounter[i]-4) % 2 == 0:
+                                 #   object.colour = WHITE
+                                 #   selectedobj = selectedobj - 1
+                              #      selobjidx.remove(i)
+                               #     print('removed %s' %i)
 #
                                 object.display()
                                 selectorder[i] = rank

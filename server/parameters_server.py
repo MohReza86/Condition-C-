@@ -16,6 +16,10 @@ LOCALHOST = False
 OS = True
 FULLSCREEN = 0
 
+selobjidx = []
+
+
+selectedobj = 0
 
 # parameter Joint MOT
 
@@ -32,11 +36,7 @@ WHITE = (255,255,255)
 RED = (255,0,0)
 GRAY = (190,190,190)
 LIGHTGRAY = (211,211,211)	
-GREEN = (0,128,0)
-
-LIGHTRED = (250,128,114)
-DARKRED = (120, 0, 0)
-
+GREEN = (34,139,34)
 
 YELLOW = (255,255,0)
 MEDYELLOW = (200,200,0)
@@ -61,14 +61,14 @@ OVERLAP_FEEDBACKCTRL = True
 EXPPATH = os.path.dirname(os.path.abspath(__file__))
 DATAPATH = EXPPATH + '/Data'
 
-TRIALS = 100
+TRIALS = 125
 
-(WIDTH,HEIGHT) = (1000,400)
+(WIDTH,HEIGHT) = (800,600)
 
 
 FPS = 30
-MOTT = 0
-MOTTf = 0*FPS
+MOTT = 11
+MOTTf = 11*FPS
 
 NUMTAR = 6
 

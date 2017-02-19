@@ -30,20 +30,20 @@ def Main():
     for trial in range(0,TRIALS):
     
         if trial > 0:
-            pygame.time.wait(500)
-            if trial % 2 == 0:
-                port += 1 
-            if trial % 2 != 0:
-                port -= 1
-            if LOCALHOST:
-                s = socket.socket()
-                s.connect((host,port))
-            else:
-                s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-                s.connect((host_ip,port))
-                confirm = s.recv(9)
-                print "connect status: %s" %confirm
-        
+                pygame.time.wait(500)
+                if trial % 2 == 0:
+                    port += 1 
+                if trial % 2 != 0:
+                    port -= 1
+                if LOCALHOST:
+                    s = socket.socket()
+                    s.connect((host,port))
+                else:
+                    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+                    s.connect((host_ip,port))
+                    confirm = s.recv(9)
+                    print "connect status: %s" %confirm
+
         running = True
         lastanglereceived = 0
         objects = []
@@ -86,7 +86,10 @@ def Main():
         fixcross()
         for object in objects[0:NUMTAR]:
             object.thickness = 0
-            object.colour = GRAY
+            if trial % 5 != 0:
+                object.colour = GRAY
+            elif trial % 5 == 0:
+                object.colour = WHITE
         for object in objects:
             object.display()
         pygame.display.flip()
@@ -108,7 +111,6 @@ def Main():
                 s.send('0' + str(o))        
                 
         s.send("::")
-        
 
         obsposrecv = True
         obspos_other = []
@@ -121,14 +123,11 @@ def Main():
             if received != "::":    
                 obspos_other.append(int(float(received)))
 
-        print obspos_other
-     
-                
-
+        doubleselected = []
+        
         for o in obspos_other:
             objects[o].thickness = 0
             objects[o].colour = COLOROTHER
-
             if o in selobjidx:
                 objects[o].thickness = 0
                 objects[o].colour = COLORME
@@ -169,7 +168,38 @@ def Main():
                 received = s.recv(1)
                 if received == "1":
                     print "overlap: ready other " + received 
-                    waitother = False        
+                    waitother = False 
+                    SCREEN.fill(BGCOLOR)
+                    text = ["Now you can modify your selctions. Please press SPACE to continue "]
+                    displayTextcenter(text,HEIGHT/4)
+                   
+                    pygame.display.flip()
+
+        corrident, mark_rt, totalperf, selectorder, selobjidx, selcor_objidx, selwrong_objidx, objects = markall(objects)
+
+        for o in selobjidx:
+            if o > 9:
+                print "sending " + str(o) 
+                s.send(str(o))        
+            else:
+                print "sending " + "0" + str(o) 
+                s.send('0' + str(o))        
+                
+        s.send("::")        
+
+        obsposrecv = True
+        obspos_other = []
+        while obsposrecv:
+            received = s.recv(2)
+            print "received " + received 
+            if received == "::":
+                break
+                obsposrecv = False
+            if received != "::":    
+                obspos_other.append(int(float(received)))
+
+        print obspos_other
+
 
         SCREEN.fill(BGCOLOR)
 
@@ -224,15 +254,40 @@ def Main():
         player2total = player2correct - player2incorrect
         
         
-        for object in objects[0:NUMTAR]:
-            if object.thickness == 0:
-                object.colour = GREEN
-                object.size = OBJRADIUS
+        allSelections = []
+        for x in selobjidx:
+            allSelections.append(x)
 
-        for object in objects[NUMTAR:]:
-            if object.thickness == 0:
-                object.colour = RED
-                object.size = OBJRADIUS
+        for y in obspos_other:
+            allSelections.append(y)
+
+        print('before %s' %allSelections)
+        removedDuplicates = list(set(allSelections))
+        print('after %s' %removedDuplicates)
+
+        pairtotal = 0
+       
+        for z in removedDuplicates:
+            print('z is %s' %z)
+            
+            if z <= NUMTAR:
+            
+                pairtotal = pairtotal + 1
+            else:
+                pairtotal = pairtotal - 1
+            
+
+        print('pairtotal is %s' %pairtotal)
+
+#        for object in objects[0:NUMTAR]:
+#            if object.thickness == 0:
+#                object.colour = GREEN
+#                object.size = OBJRADIUS
+#
+#        for object in objects[NUMTAR:]:
+#            if object.thickness == 0:
+#                object.colour = RED
+#                object.size = OBJRADIUS
 
         if EVALJOINTSELECTION == True:
             for object in objects:
@@ -260,6 +315,8 @@ def Main():
                     if received == "1:":
                         print "ready other " + received 
                         waitother = False
+                        del selobjidx[:]
+
                         break
         #s.shutdown(socket.SHUT_RDWR)
         #s.close()
